@@ -106,8 +106,8 @@ EOF
     sh("sed -i 's/# name=vhost0/name=vhost0/' /etc/contrail/contrail-vrouter-agent.conf")
     sh("sed -i 's/# physical_interface=vnet0/physical_interface=#{@intf}/' /etc/contrail/contrail-vrouter-agent.conf")
     sh("sed -i 's/# server=10.204.217.52/server=#{@contrail_controller}/' /etc/contrail/contrail-vrouter-agent.conf")
-    sh("service supervisor-vrouter restart")
-    sh("service contrail-vrouter-agent restart")
+    puts("Please do sudo reboot, followed by")
+    puts("sudo service supervisor-vrouter restart; sudo service contrail-vrouter-agent restart")
 end
 
 def main
