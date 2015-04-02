@@ -4,6 +4,7 @@
 # sudo ruby < <(curl -s https://raw.githubusercontent.com/rombie/opencontrail-netns/master/provision/fedora/contrail_compute.rb)
 
 require 'socket'
+require 'pp'
 
 @ws="#{ENV['HOME']}/contrail"
 @intf = "eth1"
@@ -74,7 +75,8 @@ end
 
 def provision_contrail_compute
     prefix = sh("ip addr show dev eth1|\grep -w inet | \grep -v dynamic | awk '{print $2}'")
-    error("Cannot retrieve #{@intf}'s IP address") if prefix !~ /(.*)\/(\d+)/
+    pp prefix
+    error("Cannot retrieve #{@intf}'s IP address") if prefix !~ /(.*)\/(\d+)$/
     ip = $1
     msk = IPAddr.new(prefix).pretty_inspect.split("/")[1].chomp.chomp(">")        
     gw = sh(%{netstat -rn |\grep "^0.0.0.0" | awk '{print $2}'})
