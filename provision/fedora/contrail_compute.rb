@@ -1,15 +1,20 @@
 #!/usr/bin/env ruby
 
+# sudo yum -y install ruby git vim
+# git clone https://github.com/rombie/opencontrail-netns.git
+# cd opencontrail-netns/provision/fedora
+
 require 'socket'
 
-@ws="~/contrail"
+@ws="#{ENV['HOME']}/contrail"
 @intf = "eth1"
 
 def sh(cmd); puts cmd; `#{cmd}`.chomp end
 def error(msg); puts msg; exit -1 end
 
 def ssh_setup
-    FILE.open("~/.ssh/config", "a") { |fp|
+    sh("mkdir -p #{ENV['HOME']}/.ssh")
+    File.open("#{ENV["HOME"]}/.ssh/config", "a") { |fp|
         conf=<<EOF
 UserKnownHostsFile=/dev/null
 StrictHostKeyChecking=no
@@ -17,21 +22,22 @@ LogLevel=QUIET
 EOF
         fp.puts(conf)
     }
-    sh("chmod 600 ~/.ssh/config")
+    sh("chmod 600 #{ENV['HOME']}/.ssh/config")
 end
 
 def initial_setup
     ssh_setup
     @contrail_controller = IPSocket.getaddress("contrail-controller")
     error "Cannot resolve contrail-controller host" if @contrail_controller.empty?
+    sh("rm -rf #{@ws}")
     sh("mkdir -p #{@ws}")
     Dir.chdir("#{@ws}")
 end
 
 # Download and extract contrail and thirdparty rpms
 def download_contrail_software
-    sh("wget https://github.com/rombie/opencontrail-netns/blob/master/provision/fedora/contrail-rpms.tar.xz -O - | tar Jx")
-    sh("wget https://github.com/rombie/opencontrail-netns/blob/master/provision/fedora/thirdparty.tar.xz -O - | tar Jx")
+    sh("wget -qO - https://github.com/rombie/opencontrail-netns/blob/master/provision/fedora/contrail-rpms.tar.xz?raw=true | tar Jx")
+    sh("wget -qO - https://github.com/rombie/opencontrail-netns/blob/master/provision/fedora/thirdparty.tar.xz?raw=true | tar Jx")
 end
 
 # Install third-party software
@@ -42,7 +48,7 @@ def install_thirdparty_software
         "#{@ws}/thirdparty/python-pycassa-1.10.0-0contrail.el7.noarch.rpm ",
     ]
 
-    sh("yum -y install #{third_party_rpms.join(" ")}"
+    sh("yum -y install #{third_party_rpms.join(" ")}")
     sh("yum -y install createrepo docker")
 end
 
@@ -51,10 +57,10 @@ def install_contrail_software
         "#{@ws}/contrail/controller/build/package-build/RPMS/x86_64/python-contrail-3.0-4100.fc21.x86_64.rpm",
         "#{@ws}/contrail/controller/build/package-build/RPMS/x86_64/python-contrail-vrouter-api-3.0-4100.fc21.x86_64.rpm",
         "#{@ws}/contrail/controller/build/package-build/RPMS/x86_64/contrail-vrouter-utils-3.0-4100.fc21.x86_64.rpm",
-        .#{@ws}/contrail/ontroller/build/package-build/RPMS/x86_64/contrail-vrouter-init-3.0-4100.fc21.x86_64.rpm",
+        "#{@ws}/contrail/controller/build/package-build/RPMS/x86_64/contrail-vrouter-init-3.0-4100.fc21.x86_64.rpm",
         "#{@ws}/contrail/controller/build/package-build/RPMS/x86_64/contrail-lib-3.0-4100.fc21.x86_64.rpm",
-        .#{@ws}/contrail/ontroller/build/package-build/RPMS/x86_64/contrail-vrouter-agent-3.0-4100.fc21.x86_64.rpm",
         "#{@ws}/contrail/controller/build/package-build/RPMS/x86_64/contrail-vrouter-3.0-4100.fc21.x86_64.rpm",
+        "#{@ws}/contrail/controller/build/package-build/RPMS/x86_64/contrail-vrouter-agent-3.0-4100.fc21.x86_64.rpm",
         "#{@ws}/contrail/controller/build/package-build/RPMS/noarch/contrail-setup-3.0-4100.fc21.noarch.rpm",
         "#{@ws}/contrail/controller/build/package-build/RPMS/noarch/contrail-vrouter-common-3.0-4100.fc21.noarch.rpm",
         "#{@ws}/contrail/controller/build/package-build/RPMS/x86_64/contrail-vrouter-init-3.0-4100.fc21.x86_64.rpm",
@@ -64,15 +70,15 @@ def install_contrail_software
     ]
 
     # Install contrail rpms
-    sh("yum -y install #{contrail_rpms.join(" ")}"
+    sh("yum -y install #{contrail_rpms.join(" ")}")
 end
 
 def provision_contrail_compute
     prefix = sh("ip addr show dev eth1|\grep -w inet | awk '{print $2}'")
-    error("Cannot retrieve #{intf}'s IP address") if prefix !~ /(.*)\/(\d+)/
+    error("Cannot retrieve #{@intf}'s IP address") if prefix !~ #{ENV['HOME']} /(.*)\/(\d+)/
     ip = $1
     msk = IPAddr.new(prefix).pretty_inspect.split("/")[1].chomp.chomp(">")        
-    gw = sh("netstat -rn |\grep "^0.0.0.0" | awk '{print $2}'")
+    gw = sh(%{netstat -rn |\grep "^0.0.0.0" | awk '{print $2}'})
 
     ifcfg = <<EOF
 #Contrail vhost0
