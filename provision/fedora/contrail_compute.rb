@@ -73,7 +73,7 @@ def install_contrail_software
 end
 
 def provision_contrail_compute
-    prefix = sh("ip addr show dev eth1|\grep -w inet | \grep -v dynamc | awk '{print $2}'")
+    prefix = sh("ip addr show dev eth1|\grep -w inet | \grep -v dynamic | awk '{print $2}'")
     error("Cannot retrieve #{@intf}'s IP address") if prefix !~ #{ENV['HOME']} /(.*)\/(\d+)/
     ip = $1
     msk = IPAddr.new(prefix).pretty_inspect.split("/")[1].chomp.chomp(">")        
