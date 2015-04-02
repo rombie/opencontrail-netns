@@ -113,9 +113,9 @@ end
 
 def main
     initial_setup
-    #download_contrail_software
-    #install_thirdparty_software
-    #install_contrail_software
+    download_contrail_software
+    install_thirdparty_software
+    install_contrail_software
     provision_contrail_compute
 end
 
