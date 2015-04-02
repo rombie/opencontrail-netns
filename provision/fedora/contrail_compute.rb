@@ -30,8 +30,8 @@ end
 
 # Download and extract contrail and thirdparty rpms
 def download_contrail_software
-    sh("wget contrail-rpms.tgz -O - | tar zx")
-    sh("wget contrail-thirdparty-rpms.tgz -O - | tar zx")
+    sh("wget https://github.com/rombie/opencontrail-netns/blob/master/provision/fedora/contrail-rpms.tar.xz -O - | tar Jx")
+    sh("wget https://github.com/rombie/opencontrail-netns/blob/master/provision/fedora/thirdparty.tar.xz -O - | tar Jx")
 end
 
 # Install third-party software
