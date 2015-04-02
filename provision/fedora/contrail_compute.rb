@@ -5,6 +5,7 @@
 
 require 'socket'
 require 'pp'
+require 'ipaddr'
 
 @ws="#{ENV['HOME']}/contrail"
 @intf = "eth1"
