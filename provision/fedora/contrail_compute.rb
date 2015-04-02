@@ -1,8 +1,7 @@
 #!/usr/bin/env ruby
 
-# sudo yum -y install ruby git vim
-# git clone https://github.com/rombie/opencontrail-netns.git
-# cd opencontrail-netns/provision/fedora
+# sudo yum -y install ruby
+# sudo ruby < <(curl -s https://raw.githubusercontent.com/rombie/opencontrail-netns/master/provision/fedora/contrail_compute.rb)
 
 require 'socket'
 
@@ -49,7 +48,7 @@ def install_thirdparty_software
     ]
 
     sh("yum -y install #{third_party_rpms.join(" ")}")
-    sh("yum -y install createrepo docker")
+    sh("yum -y install createrepo docker vim git")
 end
 
 def install_contrail_software
