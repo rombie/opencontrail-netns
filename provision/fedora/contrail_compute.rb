@@ -112,7 +112,7 @@ EOF
     sh("sed -i 's/# name=vhost0/name=vhost0/' /etc/contrail/contrail-vrouter-agent.conf")
     sh("sed -i 's/# physical_interface=vnet0/physical_interface=#{@intf}/' /etc/contrail/contrail-vrouter-agent.conf")
     sh("sed -i 's/# server=10.204.217.52/server=#{@contrail_controller}/' /etc/contrail/contrail-vrouter-agent.conf")
-    sh("sshpass -p vagrant ssh contrail-controller sudo python /opt/contrail/utils/provision_vrouter.py --host_name #{sh('hostname')} --host_ip #{ip} --api_server_ip #{contrail_controller} --oper add")
+    sh("sshpass -p vagrant ssh contrail-controller sudo python /opt/contrail/utils/provision_vrouter.py --host_name #{sh('hostname')} --host_ip #{ip} --api_server_ip #{@contrail_controller} --oper add")
     puts("Please do sudo reboot, followed by")
     puts("sudo service supervisor-vrouter restart; sudo service contrail-vrouter-agent restart")
 end
