@@ -3,6 +3,8 @@
 # sudo yum -y install ruby
 # sudo ruby < <(curl -s https://raw.githubusercontent.com/rombie/opencontrail-netns/master/provision/fedora/contrail_compute.rb)
 
+# Use this script to install and provision contrail-compute nodes
+
 require 'socket'
 require 'ipaddr'
 
@@ -12,6 +14,7 @@ require 'ipaddr'
 def sh(cmd); puts cmd; `#{cmd}`.chomp end
 def error(msg); puts msg; exit -1 end
 
+# Update ssh configuration
 def ssh_setup
     sh("mkdir -p #{ENV['HOME']}/.ssh")
     File.open("#{ENV["HOME"]}/.ssh/config", "a") { |fp|
@@ -25,6 +28,7 @@ EOF
     sh("chmod 600 #{ENV['HOME']}/.ssh/config")
 end
 
+# Do initial setup
 def initial_setup
     ssh_setup
     @contrail_controller = IPSocket.getaddress("contrail-controller")
@@ -52,6 +56,7 @@ def install_thirdparty_software
     sh("yum -y install createrepo docker vim git")
 end
 
+# Install contrail compute software
 def install_contrail_software
     contrail_rpms = [
         "#{@ws}/contrail/controller/build/package-build/RPMS/x86_64/python-contrail-3.0-4100.fc21.x86_64.rpm",
@@ -73,6 +78,7 @@ def install_contrail_software
     sh("yum -y install #{contrail_rpms.join(" ")}")
 end
 
+# Provision contrail-vrouter agent and vrouter kernel module
 def provision_contrail_compute
     prefix = sh("ip addr show dev eth1|\grep -w inet | \grep -v dynamic | awk '{print $2}'")
     error("Cannot retrieve #{@intf}'s IP address") if prefix !~ /(.*)\/(\d+)$/
