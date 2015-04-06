@@ -10,6 +10,7 @@ require 'ipaddr'
 
 @ws="#{ENV['HOME']}/contrail"
 @intf = "eth1"
+@controller_host = "kubernetes-master"
 
 def sh(cmd, ignore_exit_code = false)
     puts cmd
@@ -36,7 +37,7 @@ end
 # Do initial setup
 def initial_setup
     ssh_setup
-    @contrail_controller = IPSocket.getaddress("kubernetes-master")
+    @contrail_controller = IPSocket.getaddress(@controller_host)
     error "Cannot resolve contrail-controller host" \
         if @contrail_controller.empty?
     sh("rm -rf #{@ws}")
@@ -162,7 +163,7 @@ def provision_contrail_controller
     sh("netstat -anp | \grep LISTEN | \grep -w 8086") # Collector
     sh("netstat -anp | \grep LISTEN | \grep -w 8081") # OpServer
 
-    sh(%{python /opt/contrail/utils/provision_control.py --api_server_ip 10.245.1.2 --api_server_port 8082 --router_asn 64512 --host_name contrail-controller --host_ip 10.245.1.2 --oper add})
+    sh(%{python /opt/contrail/utils/provision_control.py --api_server_ip 10.245.1.2 --api_server_port 8082 --router_asn 64512 --host_name #{@controller_host} --host_ip 10.245.1.2 --oper add})
 end
 
 # Install third-party software
@@ -231,11 +232,11 @@ EOF
     sh("sed -i 's/# name=vhost0/name=vhost0/' /etc/contrail/contrail-vrouter-agent.conf")
     sh("sed -i 's/# physical_interface=vnet0/physical_interface=#{@intf}/' /etc/contrail/contrail-vrouter-agent.conf")
     sh("sed -i 's/# server=10.204.217.52/server=#{@contrail_controller}/' /etc/contrail/contrail-vrouter-agent.conf")
-    sh("sudo sshpass -p vagrant ssh kubernetes-master sudo python /opt/contrail/utils/provision_vrouter.py --host_name #{sh('hostname')} --host_ip #{ip} --api_server_ip #{@contrail_controller} --oper add")
+    sh("sudo sshpass -p vagrant ssh #{@controller_host} sudo python /opt/contrail/utils/provision_vrouter.py --host_name #{sh('hostname')} --host_ip #{ip} --api_server_ip #{@contrail_controller} --oper add")
     sh("sudo service supervisor-vrouter restart")
     sh("sudo service contrail-vrouter-agent restart")
     sh("sudo ifdown #{@intf}; sudo ifup #{@intf}")
-    sh("ping -c 3 kubernetes-master")
+    sh("ping -c 3 #{@controller_host}")
 end
 
 def main
