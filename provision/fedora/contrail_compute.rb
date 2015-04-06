@@ -39,7 +39,7 @@ end
 # Do initial setup
 def initial_setup
     ssh_setup
-    @contrail_controller = IPSocket.getaddress("contrail-controller")
+    @contrail_controller = IPSocket.getaddress("kubernetes-master")
     error "Cannot resolve contrail-controller host" if @contrail_controller.empty?
     sh("rm -rf #{@ws}")
     sh("mkdir -p #{@ws}")
@@ -136,22 +136,8 @@ def install_contrail_software_controller
     sh("cp -a etc/contrail/supervisord_control_files/ /etc/contrail/")
     sh("cp etc/contrail/supervisord_config_files/* /etc/contrail/supervisord_config_files/")
 
-    sh("service zookeeper start")
-    sh("service rabbitmq-server start")
-    sh("service supervisor-database start")
-    sh("service supervisor-control start")
-    sh("service supervisor-config start")
-    sh("service supervisor-analytics start")
-
-    sh("netstat -anp | \grep LISTEN | \grep 5672") # RabbitMQ
-    sh("netstat -anp | \grep LISTEN | \grep 2181") # ZooKeeper
-    sh("netstat -anp | \grep LISTEN | \grep -w 9160") # Cassandra
-    sh("netstat -anp | \grep LISTEN | \grep -w 8083") # Control-Node
-    sh("netstat -anp | \grep LISTEN | \grep -w 5998") # discovery
-    sh("netstat -anp | \grep LISTEN | \grep 8443") # IFMAP-Server
-    sh("netstat -anp | \grep LISTEN | \grep -w 8082") # API-Server
-    sh("netstat -anp | \grep LISTEN | \grep -w 8086") # Collector
-    sh("netstat -anp | \grep LISTEN | \grep -w 8081") # OpServer
+    # XXX Install missing service files.
+    sh("cp #{@ws}/controller/run/systemd/generator.late/*.service /run/systemd/generator.late/.")
 end
 
 # Provision contrail-controller
@@ -169,6 +155,27 @@ def provision_contrail_controller
     sh(%{sed -i 's/# server=0.0.0.0/server=127.0.0.1/' /etc/contrail/contrail-collector.conf})
     sh(%{sed -i 's/# user=control-user/user=control-user/g' /etc/contrail/contrail-control.conf})
     sh(%{sed -i 's/# password=control-user-passwd/password=control-user-passwd/' /etc/contrail/contrail-control.conf})
+
+    sh(%{sed -i 's/Xss180k/Xss280k/' /etc/cassandra/conf/cassandra-env.sh})
+    sh("service cassandra start")
+    sh("service zookeeper start")
+    sh("service rabbitmq-server start")
+    sh("service supervisor-database start")
+    sh("service supervisor-control start")
+    sh("service supervisor-config start")
+    sh("service supervisor-analytics start")
+
+    sleep 5
+    sh("netstat -anp | \grep LISTEN | \grep 5672") # RabbitMQ
+    sh("netstat -anp | \grep LISTEN | \grep 2181") # ZooKeeper
+    sh("netstat -anp | \grep LISTEN | \grep -w 9160") # Cassandra
+    sh("netstat -anp | \grep LISTEN | \grep -w 8083") # Control-Node
+    sh("netstat -anp | \grep LISTEN | \grep -w 5998") # discovery
+    sh("netstat -anp | \grep LISTEN | \grep 8443") # IFMAP-Server
+    sh("netstat -anp | \grep LISTEN | \grep -w 8082") # API-Server
+    sh("netstat -anp | \grep LISTEN | \grep -w 8086") # Collector
+    sh("netstat -anp | \grep LISTEN | \grep -w 8081") # OpServer
+
     sh(%{python /opt/contrail/utils/provision_control.py --api_server_ip 10.245.1.2 --api_server_port 8082 --router_asn 64512 --host_name contrail-controller --host_ip 10.245.1.2 --oper add})
 end
 
