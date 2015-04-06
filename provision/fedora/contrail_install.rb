@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
-# sudo yum -y install ruby
-# sudo ruby < <(curl -s https://raw.githubusercontent.com/rombie/opencontrail-netns/master/provision/fedora/contrail_install.rb)
+# sudo yum -y install ruby && sudo ruby < <(curl -s https://raw.githubusercontent.com/rombie/opencontrail-netns/master/provision/fedora/contrail_install.rb)
 
 # Use this script to install and provision contrail nodes.
 
