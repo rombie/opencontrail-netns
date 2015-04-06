@@ -22,15 +22,13 @@ def error(msg); puts msg; exit -1 end
 
 # Update ssh configuration
 def ssh_setup
-    sh("mkdir -p #{ENV['HOME']}/.ssh")
-    File.open("#{ENV["HOME"]}/.ssh/config", "a") { |fp|
-        conf=<<EOF
+    conf=<<EOF
 UserKnownHostsFile=/dev/null
 StrictHostKeyChecking=no
 LogLevel=QUIET
 EOF
-        fp.puts(conf)
-    }
+    sh("mkdir -p #{ENV['HOME']}/.ssh")
+    File.open("#{ENV["HOME"]}/.ssh/config", "a") { |fp| fp.puts(conf) }
     sh("chmod 600 #{ENV['HOME']}/.ssh/config")
 end
 
@@ -232,9 +230,10 @@ EOF
     sh("sed -i 's/# name=vhost0/name=vhost0/' /etc/contrail/contrail-vrouter-agent.conf")
     sh("sed -i 's/# physical_interface=vnet0/physical_interface=#{@intf}/' /etc/contrail/contrail-vrouter-agent.conf")
     sh("sed -i 's/# server=10.204.217.52/server=#{@contrail_controller}/' /etc/contrail/contrail-vrouter-agent.conf")
-    sh("sshpass -p vagrant ssh contrail-controller sudo python /opt/contrail/utils/provision_vrouter.py --host_name #{sh('hostname')} --host_ip #{ip} --api_server_ip #{@contrail_controller} --oper add")
-    puts("Please do sudo reboot, followed by")
-    puts("sudo service supervisor-vrouter restart; sudo service contrail-vrouter-agent restart")
+    sh("sudo sshpass -p vagrant ssh kubernetes-master sudo python /opt/contrail/utils/provision_vrouter.py --host_name #{sh('hostname')} --host_ip #{ip} --api_server_ip #{@contrail_controller} --oper add")
+    sh("sudo service supervisor-vrouter restart")
+    sh("sudo service contrail-vrouter-agent restart")
+    sh("sudo ifdown #{@intf}; sudo ifup #{@intf}")
 end
 
 def main
