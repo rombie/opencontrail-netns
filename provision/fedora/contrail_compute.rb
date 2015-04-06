@@ -67,9 +67,9 @@ end
 # Install third-party software from /cs-shared/builder/cache/centoslinux70/juno
 def install_thirdparty_software_controller
     sh("yum -y remove java-1.8.0-openjdk java-1.8.0-openjdk-headless")
-
+ 
     sh("yum -y install createrepo vim git vim zsh strace tcpdump")
-    sh("yum -y install supervisor supervisord python-supervisor rabbitmq-server")
+    sh("yum -y install supervisor supervisord python-supervisor rabbitmq-server python-kazoo python-ncclient")
 
     third_party_rpms = [
     "#{@ws}/thirdparty/authbind-2.1.1-0.x86_64.rpm",
@@ -115,6 +115,12 @@ def install_contrail_software_controller
     "#{@ws}/contrail/controller/build/package-build/RPMS/x86_64/contrail-web-controller-3.0-4100.x86_64.rpm",
     "#{@ws}/contrail/controller/build/package-build/RPMS/x86_64/contrail-web-core-3.0-4100.x86_64.rpm",
     "#{@ws}/contrail/controller/build/package-build/RPMS/noarch/contrail-setup-3.0-4100.fc21.noarch.rpm",
+    "#{@ws}/controller/build/package-build/RPMS/x86_64/contrail-nodemgr-3.0-4100.fc21.x86_64.rpm",
+    "#{@ws}/controller/build/package-build/RPMS/x86_64/contrail-utils-3.0-4100.fc21.x86_64.rpm",
+    "#{@ws}/controller/build/package-build/RPMS/x86_64/contrail-dns-3.0-4100.fc21.x86_64.rpm",
+    "#{@ws}/controller/build/package-build/RPMS/noarch/contrail-openstack-control-3.0-4100.fc21.noarch.rpm",
+    "#{@ws}/controller/build/package-build/RPMS/noarch/contrail-openstack-database-3.0-4100.fc21.noarch.rpm",
+    "#{@ws}/controller/build/package-build/RPMS/noarch/contrail-openstack-webui-3.0-4100.fc21.noarch.rpm",
     ]
     sh("yum -y install #{contrail_rpms.join(" ")}")
 
@@ -127,7 +133,7 @@ def install_contrail_software_controller
     sh("rpm2cpio #{@ws}/contrail/controller/build/package-build/RPMS/noarch/contrail-openstack-control-3.0-4100.fc21.noarch.rpm | cpio -idmv")
     sh("cp -a etc/contrail/supervisord_support_service_files/ /etc/contrail/")
     sh("cp -a etc/contrail/supervisord_control_files/ /etc/contrail/")
-    sh("cp -a etc/contrail/supervisord_config_files/ /etc/contrail/supervisord_config_supervisord_config_files/")
+    sh("cp etc/contrail/supervisord_config_files/* /etc/contrail/supervisord_config_files/")
 
     sh("service zookeeper start")
     sh("service rabbitmq-server start")
