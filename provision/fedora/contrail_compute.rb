@@ -96,6 +96,7 @@ def install_thirdparty_software_controller
     "#{@ws}/thirdparty/python-psutil-1.2.1-1.el7.x86_64.rpm",
     "#{@ws}/thirdparty/java-1.7.0-openjdk-1.7.0.55-2.4.7.2.el7_0.x86_64.rpm",
     "#{@ws}/thirdparty/java-1.7.0-openjdk-headless-1.7.0.55-2.4.7.2.el7_0.x86_64.rpm",
+    "#{@ws}/thirdparty/log4j-1.2.17-15.el7.noarch.rpm",
 
     # "#{@ws}/thirdparty/python-psutil-0.6.1-3.el7.x86_64.rpm",
     # "#{@ws}/thirdparty/python-keystone-2014.2.1-1.el7.centos.noarch.rpm",
