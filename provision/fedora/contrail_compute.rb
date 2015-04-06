@@ -137,7 +137,7 @@ def install_contrail_software_controller
     sh("cp etc/contrail/supervisord_config_files/* /etc/contrail/supervisord_config_files/")
 
     # XXX Install missing service files.
-    sh("cp #{@ws}/controller/run/systemd/generator.late/*.service /run/systemd/generator.late/.")
+    sh("cp #{@ws}/contrail/controller/run/systemd/generator.late/*.service /run/systemd/generator.late/.")
 end
 
 # Provision contrail-controller
