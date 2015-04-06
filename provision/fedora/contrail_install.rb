@@ -235,6 +235,7 @@ EOF
     sh("sudo service supervisor-vrouter restart")
     sh("sudo service contrail-vrouter-agent restart")
     sh("sudo ifdown #{@intf}; sudo ifup #{@intf}")
+    sh("ping -c 3 kubernetes-master")
 end
 
 def main
