@@ -78,6 +78,7 @@ def install_thirdparty_software_controller
     "#{@ws}/thirdparty/cassandra12-1.2.11-1.noarch.rpm",
     "#{@ws}/thirdparty/kafka-2.9.2-0.8.2.0.0contrail0.el7.x86_64.rpm",
     "#{@ws}/thirdparty/python-pycassa-1.10.0-0contrail.el7.noarch.rpm",
+    "#{@ws}/thirdparty/thrift-0.9.1-12.el7.x86_64.rpm",
     "#{@ws}/thirdparty/python-thrift-0.9.1-12.el7.x86_64.rpm",
     "#{@ws}/thirdparty/python-bitarray-0.8.0-0contrail.el7.x86_64.rpm",
     "#{@ws}/thirdparty/python-jsonpickle-0.3.1-2.1.el7.noarch.rpm",
@@ -126,7 +127,7 @@ def install_contrail_software_controller
     sh("rpm2cpio #{@ws}/contrail/controller/build/package-build/RPMS/noarch/contrail-openstack-control-3.0-4100.fc21.noarch.rpm | cpio -idmv")
     sh("cp -a etc/contrail/supervisord_support_service_files/ /etc/contrail/")
     sh("cp -a etc/contrail/supervisord_control_files/ /etc/contrail/")
-    sh("cp expand/etc/contrail/supervisord_config_files/* /etc/contrail/supervisord_config_supervisord_config_files/")
+    sh("cp -a etc/contrail/supervisord_config_files/ /etc/contrail/supervisord_config_supervisord_config_files/")
 
     sh("service zookeeper start")
     sh("service rabbitmq-server start")
