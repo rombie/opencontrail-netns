@@ -236,6 +236,9 @@ EOF
     sh("sudo service supervisor-vrouter restart")
     sh("sudo service contrail-vrouter-agent restart")
     sh("sudo ifdown #{@intf}; sudo ifup #{@intf}")
+    sleep 5
+    sh("sudo lsmod |\grep vrouter")
+    sh("sudo netstat -anp | \grep -w LISTEN | \grep -w 8085")
     sh("ping -c 3 #{@controller_host}")
 end
 
