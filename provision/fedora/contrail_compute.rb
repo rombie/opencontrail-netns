@@ -165,7 +165,7 @@ def provision_contrail_controller
     sh("service supervisor-config start")
     sh("service supervisor-analytics start")
 
-    sleep 5
+    sleep 30
     sh("netstat -anp | \grep LISTEN | \grep 5672") # RabbitMQ
     sh("netstat -anp | \grep LISTEN | \grep 2181") # ZooKeeper
     sh("netstat -anp | \grep LISTEN | \grep -w 9160") # Cassandra
