@@ -7,7 +7,6 @@
 
 require 'socket'
 require 'ipaddr'
-require 'pp'
 
 @ws="#{ENV['HOME']}/contrail"
 @intf = "eth1"
@@ -40,7 +39,8 @@ end
 def initial_setup
     ssh_setup
     @contrail_controller = IPSocket.getaddress("kubernetes-master")
-    error "Cannot resolve contrail-controller host" if @contrail_controller.empty?
+    error "Cannot resolve contrail-controller host" \
+        if @contrail_controller.empty?
     sh("rm -rf #{@ws}")
     sh("mkdir -p #{@ws}")
     Dir.chdir("#{@ws}")
@@ -50,18 +50,6 @@ end
 def download_contrail_software
     sh("wget -qO - https://github.com/rombie/opencontrail-netns/blob/master/provision/fedora/contrail-rpms.tar.xz?raw=true | tar Jx")
     sh("wget -qO - https://github.com/rombie/opencontrail-netns/blob/master/provision/fedora/thirdparty.tar.xz?raw=true | tar Jx")
-end
-
-# Install third-party software
-def install_thirdparty_software_compute
-    third_party_rpms = [
-    "#{@ws}/thirdparty/xmltodict-0.7.0-0contrail.el7.noarch.rpm",
-    "#{@ws}/thirdparty/consistent_hash-1.0-0contrail0.el7.noarch.rpm",
-    "#{@ws}/thirdparty/python-pycassa-1.10.0-0contrail.el7.noarch.rpm ",
-    ]
-
-    sh("yum -y install #{third_party_rpms.join(" ")}")
-    sh("yum -y install createrepo docker vim git")
 end
 
 # Install third-party software from /cs-shared/builder/cache/centoslinux70/juno
@@ -179,6 +167,18 @@ def provision_contrail_controller
     sh(%{python /opt/contrail/utils/provision_control.py --api_server_ip 10.245.1.2 --api_server_port 8082 --router_asn 64512 --host_name contrail-controller --host_ip 10.245.1.2 --oper add})
 end
 
+# Install third-party software
+def install_thirdparty_software_compute
+    third_party_rpms = [
+    "#{@ws}/thirdparty/xmltodict-0.7.0-0contrail.el7.noarch.rpm",
+    "#{@ws}/thirdparty/consistent_hash-1.0-0contrail0.el7.noarch.rpm",
+    "#{@ws}/thirdparty/python-pycassa-1.10.0-0contrail.el7.noarch.rpm ",
+    ]
+
+    sh("yum -y install #{third_party_rpms.join(" ")}")
+    sh("yum -y install createrepo docker vim git")
+end
+
 # Install contrail compute software
 def install_contrail_software_compute
     contrail_rpms = [
@@ -241,12 +241,15 @@ end
 def main
     initial_setup
     download_contrail_software
-    # install_thirdparty_software_compute
-    # install_contrail_software_compute
-    # provision_contrail_compute
-    install_thirdparty_software_controller
-    install_contrail_software_controller
-    provision_contrail_controller
+    if ARGV[0] == "controller" then
+        install_thirdparty_software_controller
+        install_contrail_software_controller
+        provision_contrail_controller
+    else # compute
+        install_thirdparty_software_compute
+        install_contrail_software_compute
+        provision_contrail_compute
+    end
 end
 
 main
