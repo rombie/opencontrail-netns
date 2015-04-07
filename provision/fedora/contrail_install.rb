@@ -185,7 +185,8 @@ def install_thirdparty_software_compute
 
     sh("yum -y install #{third_party_rpms.join(" ")}")
     sh("yum -y install sshpass createrepo docker vim git")
-    sh("service docker start", true)
+    sh("service docker start")
+    sh("docker pull ubuntu")
 end
 
 # Install contrail compute software
