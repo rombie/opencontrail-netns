@@ -7,6 +7,6 @@ if [ $? != 0 ]; then
 fi
 
 set -e
-sudo wget -qO /usr/bin/contrail_install.rb s https://raw.githubusercontent.com/rombie/opencontrail-netns/master/provision/fedora/contrail_install.rb 
+sudo wget -qO /usr/bin/contrail_install.rb https://raw.githubusercontent.com/rombie/opencontrail-netns/master/provision/fedora/contrail_install.rb 
 sudo chmod +x /usr/bin/contrail_install.rb
 sudo ruby /usr/bin/contrail_install.rb controller
