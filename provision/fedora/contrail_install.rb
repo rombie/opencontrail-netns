@@ -258,7 +258,7 @@ EOF
 
     # Restore DNS resolver
     @resolvers.each { |r|
-        sh(%{sudo sh -c "echo nameserver #{r} >> /etc/resolv.conf"})
+        sh(%{sudo sh -c "echo #{r} >> /etc/resolv.conf"})
     }
     sleep 5
     sh("sudo lsmod |\grep vrouter")
