@@ -35,6 +35,7 @@ end
 
 # Do initial setup
 def initial_setup
+    @resolvers = sh("\grep -w nameserver /etc/resolv.conf").split("\n")
     ssh_setup
     @contrail_controller = IPSocket.getaddress(@controller_host)
     error "Cannot resolve contrail-controller host" \
@@ -254,6 +255,11 @@ EOF
     sh("sudo service supervisor-vrouter restart")
     sh("sudo service contrail-vrouter-agent restart")
     sh("sudo ifdown #{@intf}; sudo ifup #{@intf}")
+
+    # Restore DNS resolver
+    @resolvers.each { |r|
+        sh(%{sudo sh -c "echo nameserver #{r} >> /etc/resolv.conf"})
+    }
     sleep 5
     sh("sudo lsmod |\grep vrouter")
     sh("sudo netstat -anp | \grep -w LISTEN | \grep -w 8085")
