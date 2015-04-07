@@ -1,8 +1,5 @@
 #!/usr/bin/env ruby
 
-# CONTRAIL_ROLE=controller ruby < <(curl -s https://raw.githubusercontent.com/rombie/opencontrail-netns/master/provision/fedora/contrail_install.rb)
-# CONTRAIL_ROLE=compute ruby < <(curl -s https://raw.githubusercontent.com/rombie/opencontrail-netns/master/provision/fedora/contrail_install.rb)
-
 # Use this script to install and provision contrail nodes.
 
 raise 'Must run as root' unless Process.uid == 0

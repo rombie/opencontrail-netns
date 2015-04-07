@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+which ruby >& /dev/null
+
+if [ $? != 0 ]; then
+    sudo yum -y install ruby
+fi
+
+set -e
+export CONTRAIL_ROLE=controller
+ruby < <(curl -s https://raw.githubusercontent.com/rombie/opencontrail-netns/master/provision/fedora/contrail_install.rb)
