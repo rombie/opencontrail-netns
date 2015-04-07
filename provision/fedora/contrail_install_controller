@@ -7,7 +7,6 @@ if [ $? != 0 ]; then
 fi
 
 set -e
-export CONTRAIL_ROLE=controller
 sudo wget -o /usr/bin/contrail_install.rb s https://raw.githubusercontent.com/rombie/opencontrail-netns/master/provision/fedora/contrail_install.rb 
 sudo chmod +x /usr/bin/contrail_install.rb
-exec ruby /usr/bin/contrail_install.rb controller
+sudo ruby /usr/bin/contrail_install.rb controller
