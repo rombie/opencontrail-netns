@@ -54,7 +54,7 @@ end
 def install_thirdparty_software_controller
     sh("yum -y remove java-1.8.0-openjdk java-1.8.0-openjdk-headless")
  
-    sh("yum -y install createrepo vim git vim zsh strace tcpdump")
+    sh("yum -y install sshpass createrepo vim git vim zsh strace tcpdump")
     sh("yum -y install supervisor supervisord python-supervisor rabbitmq-server python-kazoo python-ncclient")
 
     third_party_rpms = [
@@ -184,7 +184,8 @@ def install_thirdparty_software_compute
     ]
 
     sh("yum -y install #{third_party_rpms.join(" ")}")
-    sh("yum -y install createrepo docker vim git")
+    sh("yum -y install sshpass createrepo docker vim git")
+    sh("service docker start", true)
 end
 
 # Install contrail compute software
