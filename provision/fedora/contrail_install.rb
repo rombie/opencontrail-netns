@@ -261,7 +261,7 @@ end
 def main
     initial_setup
     download_contrail_software
-    if ENV['CONTRAIL_ROLE'] == "controller" then
+    if ARGV[0] == "controller" then
         install_thirdparty_software_controller
         install_contrail_software_controller
         provision_contrail_controller
