@@ -8,6 +8,7 @@ fi
 
 set -e
 
+sudo docker pull ubuntu
 sudo wget -qO /usr/bin/contrail_install.rb https://raw.githubusercontent.com/rombie/opencontrail-netns/master/provision/fedora/contrail_install.rb 
 sudo chmod +x /usr/bin/contrail_install.rb
 sudo ruby /usr/bin/contrail_install.rb compute
