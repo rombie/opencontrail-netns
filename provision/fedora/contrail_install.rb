@@ -129,8 +129,18 @@ def install_contrail_software_controller
     sh("cp #{@ws}/contrail/controller/run/systemd/generator.late/*.service /run/systemd/generator.late/.")
 end
 
+def update_controller_etc_hosts
+    # Update /etc/hosts with the IP address
+    sh("\grep #{@controller_host} /etc/hosts > /dev/null", true)
+    return if $?.to_i == 0
+    ip, mask, gw = get_intf_ip
+    sh("echo #{ip} #{@controller_host} >> /etc/hosts")
+end
+
 # Provision contrail-controller
 def provision_contrail_controller
+    update_controller_etc_hosts
+
     sh(%{sed -i 's/Xss180k/Xss280k/' /etc/cassandra/conf/cassandra-env.sh})
     sh(%{echo "api-server:api-server" >> /etc/ifmap-server/basicauthusers.properties})
     sh(%{echo "schema-transformer:schema-transformer" >> /etc/ifmap-server/basicauthusers.properties})
@@ -200,14 +210,21 @@ def install_contrail_software_compute
     sh("yum -y install #{contrail_rpms.join(" ")}")
 end
 
-# Provision contrail-vrouter agent and vrouter kernel module
-def provision_contrail_compute
-    prefix = sh("ip addr show dev eth1|\grep -w inet | \grep -v dynamic | awk '{print $2}'")
+# Return interface IP address, mask and gateway information
+def get_intf_ip(intf = @intf)
+    prefix = sh("ip addr show dev #{@intf}|\grep -w inet | " +
+                "\grep -v dynamic | awk '{print $2}'")
     error("Cannot retrieve #{@intf}'s IP address") if prefix !~ /(.*)\/(\d+)$/
     ip = $1
-    msk = IPAddr.new(prefix).inspect.split("/")[1].chomp.chomp(">")        
+    mask = IPAddr.new(prefix).inspect.split("/")[1].chomp.chomp(">")        
     gw = sh(%{netstat -rn |\grep "^0.0.0.0" | awk '{print $2}'})
 
+    return ip, mask, gw
+end
+
+# Provision contrail-vrouter agent and vrouter kernel module
+def provision_contrail_compute
+    ip, mask, gw = get_intf_ip
     ifcfg = <<EOF
 #Contrail vhost0
 DEVICE=vhost0
@@ -216,7 +233,7 @@ BOOTPROTO=none
 IPV6INIT=no
 USERCTL=yes
 IPADDR=#{ip}
-NETMASK=#{msk}
+NETMASK=#{mask}
 NM_CONTROLLED=no
 #NETWORK MANAGER BUG WORKAROUND
 SUBCHANNELS=1,2,3
