@@ -271,9 +271,9 @@ def provision_contrail_compute_kubernetes
        "#{@ws}/kubernetes")
     Dir.chdir("#{@ws}/kubernetes/scripts/opencontrail-kubelet")
     sh("python setup.py install")
-    plugin = "opencontrail-kubelet-plugin"
+    plugin = "opencontrail"
     sh("mkdir -p /usr/libexec/kubernetes/kubelet-plugins/net/exec/#{plugin}")
-    sh("cp /usr/bin/opencontrail-kubelet-plugin " +
+    sh("ln -sf /usr/bin/opencontrail-kubelet-plugin " +
        "/usr/libexec/kubernetes/kubelet-plugins/net/exec/#{plugin}/#{plugin}")
 
     # Generate default plugin configuration file
@@ -285,7 +285,7 @@ EOF
         fp.puts plugin_conf
     }
 
-    sh(%{sed -i 's/DAEMON_ARGS=" /DAEMON_ARGS=" --network_plugin=opencontrail-kubelet-plugin /' /etc/sysconfig/kubelet})
+    sh(%{sed -i 's/DAEMON_ARGS=" /DAEMON_ARGS=" --network_plugin=#{plugin} /' /etc/sysconfig/kubelet})
     sh("service kubelet restart")
 end
 
