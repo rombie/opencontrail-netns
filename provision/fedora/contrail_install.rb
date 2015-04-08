@@ -266,6 +266,18 @@ EOF
     sh("ping -c 3 #{@controller_host}")
 end
 
+def provision_contrail_kubernetes_compute
+    sh("git clone https://github.com/rombie/contrail-kubernetes.git")
+    Dir.chdir("contrail-kubernetes")
+    sh("python setup.py install")
+    plugin = "opencontrail-kubelet-plugin"
+    sh("mkdir -p /usr/libexec/kubernetes/kubelet-plugins/net/exec/#{plugin}")
+    sh("cp /usr/bin/opencontrail-kubelet-plugin " +
+       "/usr/libexec/kubernetes/kubelet-plugins/net/exec/#{plugin}/#{plugin}")
+    sh(%{sed -i 's/DAEMON_ARGS=" /DAEMON_ARGS=" --network_plugin=opencontrail/' /etc/sysconfig/kubelet%})
+    sh("servie kubelet restart")
+end
+
 def main
     initial_setup
     download_contrail_software
@@ -277,6 +289,7 @@ def main
         install_thirdparty_software_compute
         install_contrail_software_compute
         provision_contrail_compute
+        provision_contrail_kubernetes_compute
     end
 end
 
