@@ -267,8 +267,9 @@ EOF
 end
 
 def provision_contrail_kubernetes_compute
-    sh("git clone https://github.com/rombie/contrail-kubernetes.git")
-    Dir.chdir("contrail-kubernetes")
+    sh("git clone https://github.com/rombie/contrail-kubernetes.git " +
+       "#{@ws}/kubernetes")
+    Dir.chdir("#{@ws}/kubernetes/scripts/opencontrail-kubelet")
     sh("python setup.py install")
     plugin = "opencontrail-kubelet-plugin"
     sh("mkdir -p /usr/libexec/kubernetes/kubelet-plugins/net/exec/#{plugin}")
@@ -280,12 +281,12 @@ def provision_contrail_kubernetes_compute
 [DEFAULTS]
 api_server = #{@contrail_controller}
 EOF
-    File.open("/usr/libexec/kubernetes/kubelet-plugins/net/exec/opencontrail/config", "w") { |fp|
+    File.open("/usr/libexec/kubernetes/kubelet-plugins/net/exec/#{plugin}/config", "w")
         fp.puts plugin_conf
     }
 
-    sh(%{sed -i 's/DAEMON_ARGS=" /DAEMON_ARGS=" --network_plugin=opencontrail /' /etc/sysconfig/kubelet%})
-    sh("servie kubelet restart")
+    sh(%{sed -i 's/DAEMON_ARGS=" /DAEMON_ARGS=" --network_plugin=opencontrail-kubelet-plugin /' /etc/sysconfig/kubelet})
+    sh("service kubelet restart")
 end
 
 def main
