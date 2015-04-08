@@ -266,7 +266,7 @@ EOF
     sh("ping -c 3 #{@controller_host}")
 end
 
-def provision_contrail_kubernetes_compute
+def provision_contrail_compute_kubernetes
     sh("git clone https://github.com/rombie/contrail-kubernetes.git " +
        "#{@ws}/kubernetes")
     Dir.chdir("#{@ws}/kubernetes/scripts/opencontrail-kubelet")
@@ -300,7 +300,7 @@ def main
         install_thirdparty_software_compute
         install_contrail_software_compute
         provision_contrail_compute
-        provision_contrail_kubernetes_compute
+        provision_contrail_compute_kubernetes
     end
 end
 
