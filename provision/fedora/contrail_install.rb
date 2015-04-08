@@ -281,7 +281,7 @@ def provision_contrail_compute_kubernetes
 [DEFAULTS]
 api_server = #{@contrail_controller}
 EOF
-    File.open("/usr/libexec/kubernetes/kubelet-plugins/net/exec/#{plugin}/config", "w")
+    File.open("/usr/libexec/kubernetes/kubelet-plugins/net/exec/#{plugin}/config", "w") {
         fp.puts plugin_conf
     }
 
