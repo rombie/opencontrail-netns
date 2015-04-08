@@ -274,7 +274,7 @@ def provision_contrail_kubernetes_compute
     sh("mkdir -p /usr/libexec/kubernetes/kubelet-plugins/net/exec/#{plugin}")
     sh("cp /usr/bin/opencontrail-kubelet-plugin " +
        "/usr/libexec/kubernetes/kubelet-plugins/net/exec/#{plugin}/#{plugin}")
-    sh(%{sed -i 's/DAEMON_ARGS=" /DAEMON_ARGS=" --network_plugin=opencontrail/' /etc/sysconfig/kubelet%})
+    sh(%{sed -i 's/DAEMON_ARGS=" /DAEMON_ARGS=" --network_plugin=opencontrail /' /etc/sysconfig/kubelet%})
     sh("servie kubelet restart")
 end
 
