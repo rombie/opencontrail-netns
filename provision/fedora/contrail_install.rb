@@ -55,7 +55,7 @@ end
 def install_thirdparty_software_controller
     sh("yum -y remove java-1.8.0-openjdk java-1.8.0-openjdk-headless")
  
-    sh("yum -y install sshpass createrepo vim git vim zsh strace tcpdump")
+    init_common
     sh("yum -y install supervisor supervisord python-supervisor rabbitmq-server python-kazoo python-ncclient")
 
     third_party_rpms = [
@@ -176,8 +176,14 @@ def provision_contrail_controller
     sh(%{python /opt/contrail/utils/provision_control.py --api_server_ip 10.245.1.2 --api_server_port 8082 --router_asn 64512 --host_name #{@controller_host} --host_ip 10.245.1.2 --oper add})
 end
 
+def init_common
+    sh("yum -y install sshpass createrepo docker vim git vim zsh strace " +
+       "tcpdump unzip")
+end
+
 # Install third-party software
 def install_thirdparty_software_compute
+    init_common
     third_party_rpms = [
     "#{@ws}/thirdparty/xmltodict-0.7.0-0contrail.el7.noarch.rpm",
     "#{@ws}/thirdparty/consistent_hash-1.0-0contrail0.el7.noarch.rpm",
@@ -185,7 +191,6 @@ def install_thirdparty_software_compute
     ]
 
     sh("yum -y install #{third_party_rpms.join(" ")}")
-    sh("yum -y install sshpass createrepo docker vim git")
     sh("service docker start")
 #   sh("docker pull ubuntu")
 end
@@ -287,6 +292,11 @@ EOF
 
     sh(%{sed -i 's/DAEMON_ARGS=" /DAEMON_ARGS=" --network_plugin=#{plugin} /' /etc/sysconfig/kubelet})
     sh("service kubelet restart")
+end
+
+def sh_container(container_id, cmd, ignore = false)
+    pid = sh(%{sudo docker inspect -f {{.State.Pid}} #{container_id}})
+    sh(%{echo #{cmd} | sudo nsenter -n -t #{pid} sh})
 end
 
 def main
