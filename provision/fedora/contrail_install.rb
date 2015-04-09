@@ -285,6 +285,7 @@ def provision_contrail_compute_kubernetes
     plugin_conf = <<EOF
 [DEFAULTS]
 api_server = #{@contrail_controller}
+net_mode = bridge
 EOF
     File.open("/usr/libexec/kubernetes/kubelet-plugins/net/exec/#{plugin}/config", "w") { |fp|
         fp.puts plugin_conf
