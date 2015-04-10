@@ -278,6 +278,7 @@ EOF
     sh("lsmod |\grep vrouter")
     sh("netstat -anp | \grep -w LISTEN | \grep -w 8085")
     sh("ping -c 3 #{@controller_host}")
+    sh("ping -c 3 github.com")
 end
 
 def provision_contrail_compute_kubernetes
