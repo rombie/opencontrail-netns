@@ -31,6 +31,14 @@ EOF
     sh("mkdir -p #{ENV['HOME']}/.ssh")
     File.open("#{ENV["HOME"]}/.ssh/config", "a") { |fp| fp.puts(conf) }
     sh("chmod 600 #{ENV['HOME']}/.ssh/config")
+
+    # Add ssh config to ~vagrant also.
+    sh("mkdir -p ~vagrant/.ssh")
+    File.open(File.expand_path("~vagrant/.ssh/config"), "a") { |fp|
+        fp.puts(conf)
+    }
+    sh("chmod 600 ~vagrant/.ssh/config")
+    sh("chown vagrant.vagrant ~vagrant/.ssh/.")
 end
 
 # Do initial setup
