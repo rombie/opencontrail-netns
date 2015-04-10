@@ -186,8 +186,7 @@ def provision_contrail_controller
 end
 
 def init_common
-    sh("yum -y install sshpass createrepo docker vim git vim zsh strace " +
-       "tcpdump unzip")
+    sh("yum -y install sshpass createrepo vim git vim zsh strace tcpdump unzip")
 end
 
 # Install third-party software
@@ -200,8 +199,6 @@ def install_thirdparty_software_compute
     ]
 
     sh("yum -y install #{third_party_rpms.join(" ")}")
-    sh("service docker start")
-#   sh("docker pull ubuntu")
 end
 
 # Install contrail compute software
@@ -306,6 +303,9 @@ EOF
 end
 
 def sh_container(container_id, cmd, ignore = false)
+#   sh("yum -y install docker")
+#   sh("service docker start")
+#   sh("docker pull ubuntu")
     pid = sh(%{docker inspect -f {{.State.Pid}} #{container_id}})
     sh(%{echo #{cmd} | nsenter -n -t #{pid} sh})
 end
