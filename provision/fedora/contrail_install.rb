@@ -256,18 +256,18 @@ EOF
     sh("sed -i 's/# name=vhost0/name=vhost0/' /etc/contrail/contrail-vrouter-agent.conf")
     sh("sed -i 's/# physical_interface=vnet0/physical_interface=#{@intf}/' /etc/contrail/contrail-vrouter-agent.conf")
     sh("sed -i 's/# server=10.204.217.52/server=#{@contrail_controller}/' /etc/contrail/contrail-vrouter-agent.conf")
-    sh("sudo sshpass -p vagrant ssh vagrant@#{@controller_host} sudo python /opt/contrail/utils/provision_vrouter.py --host_name #{sh('hostname')} --host_ip #{ip} --api_server_ip #{@contrail_controller} --oper add")
-    sh("sudo service supervisor-vrouter restart")
-    sh("sudo service contrail-vrouter-agent restart")
-    sh("sudo ifdown #{@intf}; sudo ifup #{@intf}")
+    sh("sshpass -p vagrant ssh vagrant@#{@controller_host} sudo python /opt/contrail/utils/provision_vrouter.py --host_name #{sh('hostname')} --host_ip #{ip} --api_server_ip #{@contrail_controller} --oper add")
+    sh("service supervisor-vrouter restart")
+    sh("service contrail-vrouter-agent restart")
+    sh("ifdown #{@intf}; ifup #{@intf}")
 
     # Restore DNS resolver
     @resolvers.each { |r|
-        sh(%{sudo sh -c "echo #{r} >> /etc/resolv.conf"})
+        sh(%{sh -c "echo #{r} >> /etc/resolv.conf"})
     }
     sleep 5
-    sh("sudo lsmod |\grep vrouter")
-    sh("sudo netstat -anp | \grep -w LISTEN | \grep -w 8085")
+    sh("lsmod |\grep vrouter")
+    sh("netstat -anp | \grep -w LISTEN | \grep -w 8085")
     sh("ping -c 3 #{@controller_host}")
 end
 
@@ -296,8 +296,8 @@ EOF
 end
 
 def sh_container(container_id, cmd, ignore = false)
-    pid = sh(%{sudo docker inspect -f {{.State.Pid}} #{container_id}})
-    sh(%{echo #{cmd} | sudo nsenter -n -t #{pid} sh})
+    pid = sh(%{docker inspect -f {{.State.Pid}} #{container_id}})
+    sh(%{echo #{cmd} | nsenter -n -t #{pid} sh})
 end
 
 def main
