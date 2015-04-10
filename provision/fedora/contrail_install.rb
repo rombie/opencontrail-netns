@@ -38,6 +38,7 @@ EOF
         fp.puts(conf)
     }
     sh("chmod 600 ~vagrant/.ssh/config")
+    sh("chown vagrant.vagrant ~vagrant/.ssh/config")
     sh("chown vagrant.vagrant ~vagrant/.ssh/.")
 end
 
