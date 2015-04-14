@@ -200,7 +200,7 @@ def install_thirdparty_software_compute
     ]
 
     sh("yum -y install #{third_party_rpms.join(" ")}")
-    sh("service docker start")
+    sh("service docker restart")
 #   sh("docker pull ubuntu")
 end
 
