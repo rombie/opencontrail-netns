@@ -200,7 +200,7 @@ def install_thirdparty_software_compute
     ]
 
     sh("yum -y install #{third_party_rpms.join(" ")}")
-    sh("service docker restart")
+    sh("systemctl restart docker")
 #   sh("docker pull ubuntu")
 end
 
@@ -302,7 +302,7 @@ EOF
     }
 
     sh(%{sed -i 's/DAEMON_ARGS=" /DAEMON_ARGS=" --network_plugin=#{plugin} /' /etc/sysconfig/kubelet})
-    sh("service kubelet restart")
+    sh("systemctl restart kubelet")
 end
 
 def sh_container(container_id, cmd, ignore = false)
